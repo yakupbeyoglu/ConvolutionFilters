@@ -7,7 +7,7 @@ std::vector<float> Gaussiankernel (const float sigma, bool normalization) {
     float normalizationvalue = (2 * 3.14 * sigma * sigma);
     
     for(int x = -n/2; x<= n/2; x++) {
-        float value = std::exp( x * x) / (2 * sigma * sigma);
+        float value = std::exp((-1*  (x * x)) / (2 * sigma * sigma));
         value /= normalizationvalue;
         kernel.push_back(value);
     }
@@ -25,8 +25,10 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                                      EdgeDealing edgemethod,
                                      Gorgon::Graphics::RGBA color)
 {
+    
     Gorgon::Graphics::Bitmap nbmp = bmp.Duplicate();
     nbmp.Grayscale();
+    nbmp.ExportPNG("gs.png");
     float kerneltotal = KernelTotal(kernel);
   for(int y = 0; y < bmp.GetHeight(); y++) {
         for (int x = 0; x < bmp.GetWidth(); x++) {
@@ -48,14 +50,15 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                         calculatedlocation.Y = maxbmpsize.Y;
                     else if(calculatedlocation.Y < minbmpsize.Y)
                         calculatedlocation.Y = minbmpsize.Y;
-                    sum += nbmp.Get(calculatedlocation) * kernel.at(kxi);
+                    sum += bmp.Get(calculatedlocation) * kernel.at(kxi);
+                    kxi++;
                 }
                 
-                sum /= kerneltotal ? kerneltotal : 1;
+               // sum /= kerneltotal ? kerneltotal : 1;
                 nbmp(current) = sum;
              
          }
-         nbmp.ExportBMP("test.PNG");
+         nbmp.ExportBMP("result.png");
             
         }
   }

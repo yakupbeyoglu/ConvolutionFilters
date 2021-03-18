@@ -5,10 +5,11 @@
 int main() {
 std::cout<<"hello world"<<std::endl;
 Gorgon::Graphics::Bitmap bmp;
-bmp.Import("test.png");
+bmp.Import("Test3.png");
 auto gkernelx = Gaussiankernel(2, true);
 
 auto nbmp = Convolution(bmp, gkernelx);
+std::cout<<"Finish"<<std::endl;
 return 0;
 
 }
