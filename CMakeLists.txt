@@ -16,6 +16,8 @@ add_executable(${PROJECT_NAME}
     Source/Main.cpp
     Source/Filter.h
     Source/Filter.cpp
+    Source/Kernel.h
+    Source/Kernel.cpp
 )
 
 linkgorgon(${PROJECT_NAME})
