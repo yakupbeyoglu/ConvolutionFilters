@@ -4,79 +4,57 @@
 #include <initializer_list>
 #include <Gorgon/Types.h>
 #include <assert.h>
+#include <numeric>
 
 class Kernel {
 public:
+    enum class FilterAxis {
+        X,
+        Y
+    };
+    
+    Kernel() {}
+    
+    Kernel(const std::initializer_list<std::initializer_list<Gorgon::Float>> &tkernel);
+    
+    // copy constructor
+    Kernel(const Kernel &ckernel);
 
-    Kernel();
-    Kernel(const std::initializer_list<std::initializer_list<Gorgon::Float>> &tkernel) {
-        *this = tkernel;
-    }
-        // copy constructor
-    Kernel(const Kernel &ckernel) {
-     kernel = ckernel.kernel;   
-     size = ckernel.size;
-    }
-
-    Kernel &operator = (const Kernel &other) {
-        kernel = other.kernel;
-        size = other.size;
-        return *this;
-    }
+    Kernel &operator = (const Kernel &other);
     
-    Kernel &operator = (const std::initializer_list<std::initializer_list<Gorgon::Float>> & initlist) {
-        
-        int maxlistsize = initlist.begin()->size();
+    Kernel &operator = (const std::initializer_list<std::initializer_list<Gorgon::Float>> & initlist);
     
-        for(auto &list : initlist) {
-            
-            if(list.size()  > maxlistsize)
-                maxlistsize = list.size();
-        }
-            
-            for(auto &list : initlist) {
-                // if size is not equal break in debug
-                assert(list.size() == maxlistsize);
-                kernel.insert(kernel.end(), list.begin(), list.end());
-                
-                if(list.size() < maxlistsize)
-                    kernel.insert(kernel.end(), maxlistsize - list.size(), 0);
-        }        
-        
-        size.Height = initlist.size();
-        size.Width = maxlistsize;
-        
-        return *this;
-    }
+    void SetWidth(int width);
     
-
+    void SetHeight(int height);
     
-    void SetWidth(int width) {
-        size.Width = width;
-    }
+    void SetSize(Gorgon::Geometry::Size tsize);
     
-    void SetHeight(int height) {
-        size.Height = height;
-    }
+    int GetWidth()const;
     
-    void SetSize(Gorgon::Geometry::Size tsize) {
-        size = tsize;
-    }
+    int GetHeight()const;
     
-    int GetWidth()const {
-        
-        return size.Width;
-        
-    }
-    int GetHeight()const {
-        return size.Height;
-    }
+    Gorgon::Float GetKernelTotal() const;
     
-    Gorgon::Geometry::Size GetSize()const {
-        return size;
-    }
+    Gorgon::Geometry::Size GetSize() const;
+    
+    // Below include the Prepeared Filters as constructor
+    static Kernel SobelFilter(const Kernel::FilterAxis &axis);
+    
+    static Kernel Sharpen();
+    
+    static Kernel HorizontalLineDetection();
+    
+    static Kernel LowPass(int kernelsize);
+    
+    static Kernel HighPass(int kernelsize);
+    
+    static Kernel EdgeDetection(int kernelsize);
     
 private :
+    // use to create box kernel for default filters!
+    void CreateBoxKernel(float centervalue, float others);
+    
     Gorgon::Geometry::Size size;
     std::vector<Gorgon::Float> kernel;
     

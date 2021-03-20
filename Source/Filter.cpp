@@ -1,6 +1,6 @@
 #include "Filter.h"
  
- 
+/* 
 std::vector<float> Gaussiankernel (const float sigma, bool normalization) {
     std::vector<float> kernel;
     int n = 2 * sigma + 1;
@@ -18,50 +18,16 @@ std::vector<float> Gaussiankernel (const float sigma, bool normalization) {
         }
     }
     return kernel;
-}
+}*/
 
 Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
-                                     const std::vector<float> &kernel, 
+                                     const Kernel &kernel, 
                                      EdgeDealing edgemethod,
                                      Gorgon::Graphics::RGBA color)
 {
+    Gorgon::Graphics::Bitmap nbmp;
     
-    Gorgon::Graphics::Bitmap nbmp = bmp.Duplicate();
-    nbmp.Grayscale();
-    nbmp.ExportPNG("gs.png");
-    float kerneltotal = KernelTotal(kernel);
-  for(int y = 0; y < bmp.GetHeight(); y++) {
-        for (int x = 0; x < bmp.GetWidth(); x++) {
-         Gorgon::Geometry::Point current = {x, y};   
-         float sum = 0.0;
-         int kernelsize = kernel.size();
-         Gorgon::Geometry::Point  maxbmpsize= {nbmp.GetWidth()-1, nbmp.GetHeight()-1};
-         Gorgon::Geometry::Point  minbmpsize = {0, 0};
-         for (int ky = - kernelsize / 2; ky < kernelsize/2; ky++) {
-             int kxi = 0;
-                for(int kx = -kernelsize/2 ; kx < kernelsize/2; kx++) {
-                      auto calculatedlocation = current + Gorgon::Geometry::Point(kx,ky);
-                      // y*size + x
-                    if(calculatedlocation.X > maxbmpsize.X)
-                        calculatedlocation.X = maxbmpsize.X;
-                    else if (calculatedlocation.X < minbmpsize.X)
-                        calculatedlocation.X = minbmpsize.X;
-                    if(calculatedlocation.Y > maxbmpsize.Y)
-                        calculatedlocation.Y = maxbmpsize.Y;
-                    else if(calculatedlocation.Y < minbmpsize.Y)
-                        calculatedlocation.Y = minbmpsize.Y;
-                    sum += bmp.Get(calculatedlocation) * kernel.at(kxi);
-                    kxi++;
-                }
-                
-               // sum /= kerneltotal ? kerneltotal : 1;
-                nbmp(current) = sum;
-             
-         }
-         nbmp.ExportBMP("result.png");
-            
-        }
-  }
+    
     return nbmp;
 
 }
