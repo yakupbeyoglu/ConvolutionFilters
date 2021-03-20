@@ -2,41 +2,17 @@
 #include <vector>
 #include <Gorgon/Geometry/Size.h>
 #include <initializer_list>
+#include <Gorgon/Types.h>
+#include <assert.h>
 
-template <class T_>
 class Kernel {
 public:
-    Kernel(const std::initializer_list<T_> &kernel, 
-        const Gorgon::Geometry::Size &size): kernel(kernel), size(size) {
-        
+
+    Kernel();
+    Kernel(const std::initializer_list<std::initializer_list<Gorgon::Float>> &tkernel) {
+        *this = tkernel;
     }
-    
-    Kernel(const std::initializer_list<std::initializer_list<T_>> &tkernel) {
-        const auto &listwidth = tkernel.begin();
-        size.Height = tkernel.size();
-        size.Width = listwidth->size();
-        for(auto element : tkernel){
-            for(auto el:element){
-                kernel.push_back(el);
-                
-            }
-            
-        }
-        
-    }
-    
-    Kernel & operator = (const std::initializer_list<std::initializer_list<T_>> & initlist){
-            Kernel nkernel;
-            for(auto element : initlist){
-            for(auto el:element){
-                nkernel.push_back(el);
-                
-            }
-            
-        }
-        return nkernel;
-    }
-    // copy constructor
+        // copy constructor
     Kernel(const Kernel &ckernel) {
      kernel = ckernel.kernel;   
      size = ckernel.size;
@@ -45,7 +21,35 @@ public:
     Kernel &operator = (const Kernel &other) {
         kernel = other.kernel;
         size = other.size;
+        return *this;
     }
+    
+    Kernel &operator = (const std::initializer_list<std::initializer_list<Gorgon::Float>> & initlist) {
+        
+        int maxlistsize = initlist.begin()->size();
+    
+        for(auto &list : initlist) {
+            
+            if(list.size()  > maxlistsize)
+                maxlistsize = list.size();
+        }
+            
+            for(auto &list : initlist) {
+                // if size is not equal break in debug
+                assert(list.size() == maxlistsize);
+                kernel.insert(kernel.end(), list.begin(), list.end());
+                
+                if(list.size() < maxlistsize)
+                    kernel.insert(kernel.end(), maxlistsize - list.size(), 0);
+        }        
+        
+        size.Height = initlist.size();
+        size.Width = maxlistsize;
+        
+        return *this;
+    }
+    
+
     
     void SetWidth(int width) {
         size.Width = width;
@@ -74,6 +78,6 @@ public:
     
 private :
     Gorgon::Geometry::Size size;
-    std::vector<T_> kernel;
+    std::vector<Gorgon::Float> kernel;
     
 };

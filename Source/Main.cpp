@@ -6,8 +6,7 @@
 int main() {
 std::cout<<"hello world"<<std::endl;
 Gorgon::Graphics::Bitmap bmp;
-Kernel<int>k({1,3,4},{3,5});
-Kernel<int>l({{1,2,3},{3,4,6,7,8,9}});
+Kernel l({{1,2,3},{3,6,7}});
 std::cout<<"Finish"<<std::endl;
 return 0;
 
