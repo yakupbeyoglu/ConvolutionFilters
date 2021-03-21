@@ -91,10 +91,6 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
     Gorgon::Geometry::Point maxbounds = { bmp.GetWidth() -1 , bmp.GetHeight() - 1};
     Gorgon::Geometry::Point minbounds = {0, 0};
     
-    
-    
-    
-    
     for(int y = 0; y < bmp.GetHeight(); y++) {
         for(int x = 0; x < bmp.GetWidth(); x++) {
             std::vector<float> calculatedvalue(numberofchannel,0.0);
@@ -123,8 +119,6 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                       
                     auto kernelvalue = kernel.GetValue((kernely + kernel.GetHeight()/2) * kernel.GetWidth() + (kernelx + kernel.GetWidth()/2));
                     
-                        
-                        
                     if(edgemethod == EdgeDealing::FixedColor && isedge) {
                             calculatedvalue[0] = nfixed.R * kernelvalue;
                             calculatedvalue[1] = nfixed.G * kernelvalue;
@@ -133,7 +127,6 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                     else {
                         for(unsigned int  channel = 0; channel < numberofchannel; channel++) {
                             calculatedvalue[channel] += bmp.Get(current, channel)* kernelvalue;
-                            
                         }
                     }
                 }
@@ -155,70 +148,13 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                 
                         
             }
-                    
-                
-                
-                
         }
-                
-                
-                
-                
     }
-        nbmp.ExportPNG("ybtest.png");
             
-          return nbmp;  
-            
-            
+    return nbmp;  
+     
 }
 
         
         
-        
-        
-    
-    
-    
-    
-    
-    
 
- 
-    
-    
-
-
- /*
- Gorgon::Graphics::Bitmap	bmp2 = bmp.Duplicate();
-            bmp2.Grayscale();
-            auto kerneltotal = KernelTotal(kernel);
-            Gorgon::Geometry::Point max = { bmp.GetWidth()-1,bmp.GetHeight()-1};
-            Gorgon::Geometry::Point min = { 0,0 };
-
-                for (int y = 0; y < bmp2.GetHeight(); y++) {
-                    for (int x = 0; x < bmp2.GetWidth(); x++) {
-                        Gorgon::Geometry::Point current = { x,y };
-                        double sum = 0;
-                        bool status = false;
-                        for (auto location : kernel) {
-                            auto calculatedlocation = current + location.Get();
-                    
-                            if (calculatedlocation.X > max.X)
-                                calculatedlocation.X = max.X;
-                            else if (calculatedlocation.X < min.X)
-                                calculatedlocation.X = min.X;
-                            if (calculatedlocation.Y > max.Y)
-                                calculatedlocation.Y = max.Y;
-                            else if (calculatedlocation.Y < min.Y)
-                                calculatedlocation.Y = min.Y;
-
-                            sum += bmp2.Get(calculatedlocation)*location.Getvalue();
-                        }
-                        sum /= kerneltotal ? kerneltotal : 1;
-                    
-                        bmp2(current) = sum;
-                    }
-                }
-                bmp2.ExportBMP("newclamping.PNG");
-            return bmp2;
-*/
