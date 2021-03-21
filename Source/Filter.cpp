@@ -77,9 +77,9 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                                      EdgeDealing edgemethod,
                                      Gorgon::Graphics::RGBA fixedcolor, bool alphachanneldisable)
 {
-    Gorgon::Graphics::Bitmap nbmp;
+    Gorgon::Graphics::Bitmap nbmp = bmp.Duplicate();
     Gorgon::Graphics::RGBA nfixed  = GetFixedColor(bmp.GetMode(), fixedcolor);
-    nbmp.Resize(bmp.GetSize());
+
      if(bmp.IsEmpty())
         return nbmp;
      
@@ -99,8 +99,8 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
         for(int x = 0; x < bmp.GetWidth(); x++) {
             std::vector<float> calculatedvalue(numberofchannel,0.0);
 
-            for(int kernely = -kernel.GetHeight() / 2; kernely < kernel.GetHeight() / 2; kernely++) {
-                for(int kernelx = -kernel.GetWidth() / 2; kernelx < kernel.GetWidth() / 2; kernelx++) {
+            for(int kernely = -kernel.GetHeight() / 2; kernely <= kernel.GetHeight() / 2; kernely++) {
+                for(int kernelx = -kernel.GetWidth() / 2; kernelx <= kernel.GetWidth() / 2; kernelx++) {
                     Gorgon::Geometry::Point current = {x + kernelx, y + kernely};
                     bool isedge;
                     if(current.X  > maxbounds.X) {
@@ -123,8 +123,6 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                       
                     auto kernelvalue = kernel.GetValue((kernely + kernel.GetHeight()/2) * kernel.GetWidth() + (kernelx + kernel.GetWidth()/2));
                     
-                    // calculate for each channel
-                    if(edgemethod == EdgeDealing::FixedColor && isedge)
                         
                         
                     if(edgemethod == EdgeDealing::FixedColor && isedge) {
@@ -167,6 +165,7 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                 
                 
     }
+        nbmp.ExportPNG("ybtest.png");
             
           return nbmp;  
             
