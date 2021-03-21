@@ -62,7 +62,11 @@ Gorgon::Float Kernel::GetKernelTotal() const {
     float total = std::accumulate(kernel.begin(),kernel.end(), 0.0f);
     return total;
 }
-    
+
+Gorgon::Float Kernel::GetValue(int index) const {
+    return kernel.at(index);
+}
+
 Gorgon::Geometry::Size Kernel::GetSize() const {
     return size;
 }

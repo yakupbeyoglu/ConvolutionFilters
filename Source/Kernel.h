@@ -36,6 +36,9 @@ public:
     
     Gorgon::Float GetKernelTotal() const;
     
+    Gorgon::Float GetValue(int index) const;
+    
+    
     Gorgon::Geometry::Size GetSize() const;
     
     // Below include the Prepeared Filters as constructor

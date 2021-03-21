@@ -3,6 +3,7 @@
 #include <numeric>
 #include <math.h>
 #include <Gorgon/Graphics/Bitmap.h>
+#include <Gorgon/Geometry/Point.h>
 #include <Gorgon/Graphics/Color.h>
 #include "Kernel.h"
 
@@ -16,7 +17,14 @@ enum class EdgeDealing {
 
 
 std::vector<float> Gaussiankernel(const float sigma, bool normalization = true);
+
+void ApplyFilter(Gorgon::Graphics::Bitmap &bmp, Gorgon::Geometry::Point &coordinates, int channel, int value);
+
+
+
+
 Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                                      const Kernel &kernel, 
                                      EdgeDealing edgemethod = EdgeDealing::ClosestPixel,                 
-                                     Gorgon::Graphics::RGBA color = Gorgon::Graphics::Color::White); 
+                                     Gorgon::Graphics::RGBA color = Gorgon::Graphics::Color::White, 
+                                     bool alphachanneldisable = false); 
