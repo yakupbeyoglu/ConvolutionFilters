@@ -1,5 +1,5 @@
 #include "Filter.h"
- 
+#include <array>
 
 void ApplyFilter(Gorgon::Graphics::Bitmap &bmp, Gorgon::Geometry::Point &coordinates, int channel, int value) 
 {
@@ -7,7 +7,7 @@ void ApplyFilter(Gorgon::Graphics::Bitmap &bmp, Gorgon::Geometry::Point &coordin
     
 }
 
-void DealingEdge(const EdgeDealing &method, int &current, int max, int min, bool isless = false) {
+void DealingEdge(const EdgeDealing &method, int &current, int max, int min, bool isless) {
     int value = isless ? min : max;
     
     switch(method) {
@@ -26,10 +26,10 @@ void DealingEdge(const EdgeDealing &method, int &current, int max, int min, bool
             current = value;
             break;
     }
-
+    
 }
 
-Gorgon::Graphics::RGBA GetFixedColor(const Gorgon::Graphics::ColorMode &mode, const Gorgon::Graphics::RGBA &color) {
+std::array<Gorgon::Byte,4> GetFixedColor(const Gorgon::Graphics::ColorMode &mode, const Gorgon::Graphics::RGBA &color) {
     Gorgon::Graphics::RGBA ncolor;
     
     switch(mode){
@@ -67,9 +67,11 @@ Gorgon::Graphics::RGBA GetFixedColor(const Gorgon::Graphics::ColorMode &mode, co
             break;
         default:
             ;
+            
     }
+    std::array<Gorgon::Byte, 4>  colors = {ncolor.R, ncolor.G, ncolor.B, ncolor.A};
     
-    return ncolor;
+    return colors;
     
 }
 Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
@@ -77,12 +79,16 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                                      EdgeDealing edgemethod,
                                      Gorgon::Graphics::RGBA fixedcolor, bool alphachanneldisable)
 {
-    Gorgon::Graphics::Bitmap nbmp = bmp.Duplicate();
-    Gorgon::Graphics::RGBA nfixed  = GetFixedColor(bmp.GetMode(), fixedcolor);
-
-     if(bmp.IsEmpty())
+    
+    Gorgon::Graphics::Bitmap nbmp(bmp.GetWidth(), bmp.GetHeight(), bmp.GetMode());
+    
+    if(bmp.IsEmpty())
         return nbmp;
-     
+    
+    std::array<Gorgon::Byte, 4 > fixedcolorarray;
+    if(edgemethod == EdgeDealing::FixedColor)
+        fixedcolorarray  = GetFixedColor(bmp.GetMode(), fixedcolor);
+    
     // find number of avaliable channel
     int numberofchannel = bmp.GetChannelsPerPixel();
     // check which is alpha if not have it will -1
@@ -94,49 +100,53 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
     for(int y = 0; y < bmp.GetHeight(); y++) {
         for(int x = 0; x < bmp.GetWidth(); x++) {
             std::vector<float> calculatedvalue(numberofchannel,0.0);
-
+            
             for(int kernely = -kernel.GetHeight() / 2; kernely <= kernel.GetHeight() / 2; kernely++) {
                 for(int kernelx = -kernel.GetWidth() / 2; kernelx <= kernel.GetWidth() / 2; kernelx++) {
                     Gorgon::Geometry::Point current = {x + kernelx, y + kernely};
-                    bool isedge;
-                    if(current.X  > maxbounds.X) {
-                       DealingEdge(edgemethod, current.X, maxbounds.X, minbounds.X);
-                        isedge = true;
-                    }
-                    else if(current.X < minbounds.X) {
-                        DealingEdge(edgemethod, current.X, maxbounds.X, minbounds.X, true);
-                        isedge = true;
-                    }
-                    if(current.Y > maxbounds.Y) {
-                        DealingEdge(edgemethod, current.Y, maxbounds.Y, minbounds.Y);
-                        isedge = true;
-                    }
-                    
-                    else if(current.Y < minbounds.Y) {
-                        DealingEdge(edgemethod, current.Y, maxbounds.Y, minbounds.Y, true);
-                        isedge = true;
-                    }
-                      
+                    bool isedge = false;
                     auto kernelvalue = kernel.GetValue((kernely + kernel.GetHeight()/2) * kernel.GetWidth() + (kernelx + kernel.GetWidth()/2));
                     
-                    if(edgemethod == EdgeDealing::FixedColor && isedge) {
-                            calculatedvalue[0] = nfixed.R * kernelvalue;
-                            calculatedvalue[1] = nfixed.G * kernelvalue;
-                            calculatedvalue[2]= nfixed.B * kernelvalue;
+                    if((current.X > maxbounds.X || current.X < minbounds.X ||
+                        current.Y > maxbounds.Y || current.Y < minbounds.Y) &&
+                        edgemethod == EdgeDealing::FixedColor)
+                        isedge = true;
+                    
+                    else {
+                        
+                        if(current.X  > maxbounds.X) 
+                            DealingEdge(edgemethod, current.X, maxbounds.X, minbounds.X);
+                        
+                        else if(current.X < minbounds.X) 
+                            DealingEdge(edgemethod, current.X, maxbounds.X, minbounds.X, true);
+                        
+                        if(current.Y > maxbounds.Y) 
+                            DealingEdge(edgemethod, current.Y, maxbounds.Y, minbounds.Y);
+                        
+                        
+                        else if(current.Y < minbounds.Y) 
+                            DealingEdge(edgemethod, current.Y, maxbounds.Y, minbounds.Y, true);
+                        
                     }
+                    
+                    if(isedge) {
+                        for(int i = 0; i < numberofchannel; i++)
+                            calculatedvalue[i] = fixedcolorarray[i] * kernelvalue;
+                    }
+                    
                     else {
                         for(unsigned int  channel = 0; channel < numberofchannel; channel++) {
                             calculatedvalue[channel] += bmp.Get(current, channel)* kernelvalue;
                         }
                     }
                 }
-                        
+                
             }
             
             for(unsigned int channel = 0; channel < numberofchannel; channel++) {
                 if(channel == alphaindex && !alphachanneldisable)
                     continue;
-               
+                
                 // if is edge detection should be cycle it 
                 if(calculatedvalue.at(channel) < 0)
                     calculatedvalue.at(channel) = 0;
@@ -146,15 +156,15 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                 
                 nbmp(x, y, channel) = calculatedvalue.at(channel);
                 
-                        
+                
             }
         }
     }
-            
+    
     return nbmp;  
-     
+    
 }
 
-        
-        
+
+
 

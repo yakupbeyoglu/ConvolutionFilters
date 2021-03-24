@@ -17,11 +17,9 @@ enum class EdgeDealing {
 
 
 std::vector<float> Gaussiankernel(const float sigma, bool normalization = true);
-
+void DealingEdge(const EdgeDealing &method, int &current, int max, int min, bool isless = false);
 void ApplyFilter(Gorgon::Graphics::Bitmap &bmp, Gorgon::Geometry::Point &coordinates, int channel, int value);
-
-
-
+std::array<Gorgon::Byte,4> GetFixedColor(const Gorgon::Graphics::ColorMode &mode, const Gorgon::Graphics::RGBA &color);
 
 Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                                      const Kernel &kernel, 
