@@ -54,6 +54,8 @@ public:
     
     static Kernel EdgeDetection(int kernelsize);
     
+    static Kernel GaussianKernel(const float sigma);
+    
 private :
     // use to create box kernel for default filters!
     void CreateBoxKernel(float centervalue, float others);

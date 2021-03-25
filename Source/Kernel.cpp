@@ -123,6 +123,23 @@ Kernel Kernel::EdgeDetection(int kernelsize) {
     
 }
 
+Kernel Kernel::GaussianKernel(const float sigma) {
+    Kernel nkernel;
+    int size = 2 * sigma + 1;
+    float base1 = 2 * sigma * sigma;
+    float base2 = std::sqrt(2 * 3.14 * sigma * sigma);
+    for(int x = 0; x < size; x++) {
+        auto value = -1 * std::exp(x * x) / base1 / base2;
+        nkernel.kernel.push_back(value);
+    }
+    auto total = nkernel.GetKernelTotal();
+       for (auto &n : nkernel.kernel) {
+                n = n / total;
+            }
+            
+    return nkernel;
+}
+
 void Kernel::CreateBoxKernel(float centervalue, float others) {
     int centerindex = size.Height / 2;
     
