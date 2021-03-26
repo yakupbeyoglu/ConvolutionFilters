@@ -99,11 +99,11 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
     
     for(int y = 0; y < nbmp.GetHeight(); y++) {
         for(int x = 0; x < nbmp.GetWidth(); x++) {
-            std::vector<float> calculatedvalue(numberofchannel,0.0);
+            std::vector<float> calculatedvalue(numberofchannel, 0.0);
             
             for(int kernely = 0; kernely < kernel.GetHeight(); kernely++) {
                 for(int kernelx = 0; kernelx < kernel.GetWidth(); kernelx++) {
-                    Gorgon::Geometry::Point current =  {x + (kernelx - kernel.GetWidth()), y + (kernely - kernel.GetHeight())};
+                    Gorgon::Geometry::Point current =  {x + (kernelx - kernel.GetWidth()), y + (kernely - kernel.GetWidth())};
                     bool isedge = false;
                     auto kernelvalue = kernel.GetValue(kernely * kernel.GetWidth() + kernelx);
                     if(normalization)

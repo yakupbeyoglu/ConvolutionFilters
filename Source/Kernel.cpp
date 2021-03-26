@@ -50,6 +50,10 @@ void Kernel::SetSize(Gorgon::Geometry::Size tsize) {
     size = tsize;
 }
 
+void Kernel::SetSize(int width, int height) {
+    size = {width, height};
+}
+
 int Kernel::GetWidth() const {
     return size.Width;
 }
@@ -58,6 +62,10 @@ int Kernel::GetHeight() const {
     return size.Height;
 }
     
+Gorgon::Geometry::Size Kernel::GetSize() const {
+    return size;
+}
+
 Gorgon::Float Kernel::GetKernelTotal() const {
     float total = std::accumulate(kernel.begin(),kernel.end(), 0.0f);
     return total;
@@ -67,9 +75,6 @@ Gorgon::Float Kernel::GetValue(int index) const {
     return kernel.at(index);
 }
 
-Gorgon::Geometry::Size Kernel::GetSize() const {
-    return size;
-}
 
 Kernel Kernel::SobelFilter(const Kernel::FilterAxis &axis) {
     Kernel nkernel;
@@ -123,19 +128,22 @@ Kernel Kernel::EdgeDetection(int kernelsize) {
     
 }
 
-Kernel Kernel::GaussianKernel(const float sigma) {
+Kernel Kernel::GaussianKernel(const float sigma, FilterAxis axis) {
     Kernel nkernel;
     int size = 2 * sigma + 1;
+    
+    if(axis == FilterAxis::Y)
+        nkernel.SetSize({1,size});
+    else
+        nkernel.SetSize({size, 1});
+
+        
     float base1 = 2 * sigma * sigma;
-    float base2 = std::sqrt(2 * 3.14 * sigma * sigma);
+    float base2 = 2 * 3.14 * sigma * sigma;
     for(int x = 0; x < size; x++) {
-        auto value = -1 * std::exp(x * x) / base1 / base2;
+        auto value =  (std::exp( -1 * x * x) / base1) / base2;
         nkernel.kernel.push_back(value);
     }
-    auto total = nkernel.GetKernelTotal();
-       for (auto &n : nkernel.kernel) {
-                n = n / total;
-            }
             
     return nkernel;
 }

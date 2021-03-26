@@ -30,16 +30,17 @@ public:
     
     void SetSize(Gorgon::Geometry::Size tsize);
     
+    void SetSize(int width, int height);
+    
     int GetWidth()const;
     
     int GetHeight()const;
+
+    Gorgon::Geometry::Size GetSize() const;
     
     Gorgon::Float GetKernelTotal() const;
     
     Gorgon::Float GetValue(int index) const;
-    
-    
-    Gorgon::Geometry::Size GetSize() const;
     
     // Below include the Prepeared Filters as constructor
     static Kernel SobelFilter(const Kernel::FilterAxis &axis);
@@ -54,7 +55,7 @@ public:
     
     static Kernel EdgeDetection(int kernelsize);
     
-    static Kernel GaussianKernel(const float sigma);
+    static Kernel GaussianKernel(const float sigma, FilterAxis axis);
     
 private :
     // use to create box kernel for default filters!
