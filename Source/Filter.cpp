@@ -166,6 +166,24 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
     
 }
 
+Gorgon::Graphics::Bitmap GradientMagnitude(Gorgon::Graphics::Bitmap &x, Gorgon::Graphics::Bitmap &y) {
+    Gorgon::Graphics::Bitmap s = x.Duplicate();
+    int numberofchannel = x.GetChannelsPerPixel();
+    for (int j = 0; j < s.GetHeight(); j++) {
+        for (int i = 0; i < s.GetWidth(); i++) {
+            for (int nc = 0; nc < numberofchannel; nc++) {
+                float value = std::sqrt(std::pow(x(i, j, nc), 2) + std::pow(y(i, j, nc), 2));
+                if (value > 255)
+                    value = 255;
+                else if (value < 0)
+                    value = 0;
+                s(i, j, nc) = value;
 
+            }
+        }
+
+    }
+    return s;
+}
 
 

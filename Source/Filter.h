@@ -26,3 +26,5 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                                      EdgeDealing edgemethod = EdgeDealing::ClosestPixel,                 
                                      Gorgon::Graphics::RGBA color = Gorgon::Graphics::Color::White, 
                                      bool alphachanneldisable = false, bool normalization = false); 
+
+Gorgon::Graphics::Bitmap GradientMagnitude(Gorgon::Graphics::Bitmap &x, Gorgon::Graphics::Bitmap &y);
