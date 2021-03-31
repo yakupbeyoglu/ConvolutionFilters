@@ -30,49 +30,34 @@ void DealingEdge(const EdgeDealing &method, int &current, int max, int min, bool
 }
 
 std::array<Gorgon::Byte,4> GetFixedColor(const Gorgon::Graphics::ColorMode &mode, const Gorgon::Graphics::RGBA &color) {
-    Gorgon::Graphics::RGBA ncolor;
     
     switch(mode){
         case Gorgon::Graphics::ColorMode::Alpha:
-            ncolor.A = color.A;
+            return {color.A};
             break;
         case Gorgon::Graphics::ColorMode::Grayscale_Alpha:
-            ncolor.R = color.Luminance();
-            ncolor.A = color.A;
+            return {color.Luminance(), color.A};
             break;
         case Gorgon::Graphics::ColorMode::Grayscale:
-            ncolor.R = color.Luminance();
+            return {color.Luminance()};
             break;
         case Gorgon::Graphics::ColorMode::RGB:
-            ncolor.R = color.R;
-            ncolor.G = color.G;
-            ncolor.B = color.B;
+            return {color.R, color.G, color.B};
             break;
         case Gorgon::Graphics::ColorMode::BGR:
-            ncolor.B = color.R;
-            ncolor.G = color.G;
-            ncolor.R = color.B;
+            return {color.B, color.G, color.R};
             break;
         case Gorgon::Graphics::ColorMode::RGBA:
-            ncolor.R = color.R;
-            ncolor.G = color.G;
-            ncolor.B = color.B;
-            ncolor.A = color.A;
+            return {color.R, color.G, color.B, color.A};
             break;
         case Gorgon::Graphics::ColorMode::BGRA:
-            ncolor.B = color.R;
-            ncolor.G = color.G;
-            ncolor.R = color.B;
-            ncolor.A = color.A;
+            return {color.B, color.G, color.R, color.A};
             break;
         default:
-            ;
+            return {};
             
     }
-    
-    std::array<Gorgon::Byte, 4>  colors = {ncolor.R, ncolor.G, ncolor.B, ncolor.A};
-    return colors;
-    
+        
 }
 Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
                                      const Kernel &kernel, 
@@ -101,11 +86,11 @@ Gorgon::Graphics::Bitmap Convolution(const Gorgon::Graphics::Bitmap &bmp,
         for(int x = 0; x < nbmp.GetWidth(); x++) {
             std::vector<float> calculatedvalue(numberofchannel, 0.0);
             
-            for(int kernely = 0; kernely < kernel.GetHeight(); kernely++) {
-                for(int kernelx = 0; kernelx < kernel.GetWidth(); kernelx++) {
-                    Gorgon::Geometry::Point current =  {x + (kernelx - kernel.GetWidth()), y + (kernely - kernel.GetWidth())};
+            for(int kernely = -kernel.GetHeight() / 2; kernely <= (kernel.GetHeight() - 1) / 2; kernely++) {
+                for(int kernelx = -kernel.GetWidth() / 2; kernelx <= (kernel.GetWidth() - 1) / 2; kernelx++) {
+                    Gorgon::Geometry::Point current =  {x + kernelx, y + kernely};
                     bool isedge = false;
-                    auto kernelvalue = kernel.GetValue(kernely * kernel.GetWidth() + kernelx);
+                    auto kernelvalue = kernel.GetValue((kernely + kernel.GetHeight() / 2) * kernel.GetWidth() + (kernelx + kernel.GetWidth() / 2));
                     if(normalization)
                         kernelvalue/= kernel.GetKernelTotal();
                     
